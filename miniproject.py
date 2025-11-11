@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 # ✅ Use Streamlit’s temp directory to avoid permission issues
-FILENAME = os.path.join("/tmp", "expense_data.csv")
+FILENAME = os.path.join(os.getcwd(), 'expense_data.csv')
 
 def initialize_file():
     if not os.path.exists(FILENAME):
@@ -53,3 +53,4 @@ if not df.empty:
             st.success(f"Remaining Balance: ₹{balance:.2f}")
 else:
     st.info("No expenses found yet.")
+
