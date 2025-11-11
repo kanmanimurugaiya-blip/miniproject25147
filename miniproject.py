@@ -20,6 +20,16 @@ def view_expenses():
     df = pd.read_csv(FILENAME)
     return df
 
+def delete_expense(index):
+    df = pd.read_csv(FILENAME)
+    df = df.drop(index)
+    df.to_csv(FILENAME, index=False)
+
+def edit_expense(index, date, amount, category, description):
+    df = pd.read_csv(FILENAME)
+    df.loc[index, ['Date', 'Amount', 'Category', 'Description']] = [date, amount, category, description]
+    df.to_csv(FILENAME, index=False)
+
 # --- STREAMLIT APP ---
 st.set_page_config(page_title="Expense Tracker", page_icon="💰")
 st.title("💰 Expense Tracker Web App")
@@ -41,7 +51,31 @@ if st.button("Add Expense"):
 df = view_expenses()
 if not df.empty:
     st.header("📜 All Expenses")
-    st.dataframe(df)
+
+    for i, row in df.iterrows():
+        with st.expander(f"{row['Date']} | ₹{row['Amount']} - {row['Category']}"):
+            st.write(f"**Description:** {row['Description']}")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button(f"✏️ Edit {i}", key=f"edit_{i}"):
+                    with st.form(f"edit_form_{i}"):
+                        new_date = st.date_input("Date", pd.to_datetime(row['Date']))
+                        new_amount = st.number_input("Amount", value=float(row['Amount']), min_value=0.0, format="%.2f")
+                        new_category = st.text_input("Category", value=row['Category'])
+                        new_description = st.text_area("Description", value=row['Description'])
+                        submit_edit = st.form_submit_button("Save Changes")
+                        if submit_edit:
+                            edit_expense(i, new_date, new_amount, new_category, new_description)
+                            st.success("Expense updated successfully.")
+                            st.rerun()
+
+            with col2:
+                if st.button(f"🗑️ Delete {i}", key=f"delete_{i}"):
+                    delete_expense(i)
+                    st.warning("Expense deleted.")
+                    st.rerun()
 
     total = df['Amount'].sum()
     st.write(f"### 💵 Total Expenses: ₹{total:.2f}")
@@ -53,4 +87,3 @@ if not df.empty:
             st.success(f"Remaining Balance: ₹{balance:.2f}")
 else:
     st.info("No expenses found yet.")
-
