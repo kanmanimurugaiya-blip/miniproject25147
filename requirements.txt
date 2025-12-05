@@ -1,5 +1,8 @@
 ﻿streamlit
 pandas
-import plotly.express as px
+numpy
+plotly
+
+
 
 
