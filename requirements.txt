@@ -1,7 +1,9 @@
-﻿streamlit
+streamlit
 pandas
+matplotlib
+reportlab
 numpy
-plotly
+
 
 
 
